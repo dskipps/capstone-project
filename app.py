@@ -1,0 +1,41 @@
+from flask import Flask, render_template, request, redirect, session
+
+app = Flask(__name__)
+
+# ─── TEMPORARY USER STORE (replace with DynamoDB later) ──────────────
+USERS = {
+    "admin@example.com": {"name": "Admin", "password": "letmein"},
+    # add more predefined users here
+}
+# ─────────────────────────────────────────────────────────────────────
+
+@app.route("/signin", methods=["GET", "POST"])
+def signin():
+    
+    error = None
+
+    if request.method == 'POST':
+        email = request.form["email"].lower()
+        pwd   = request.form["password"]
+        
+        user = USERS.get(email)
+        if user and user["password"] == pwd:
+            session["email"] = email
+            return redirect(("/"))
+        return redirect("/signin")
+    
+    return render_template("signin.html", error=error)
+
+@app.route("/logout")
+def logout():
+    session.pop("email", None)
+    return redirect("/signin")
+
+@app.route("/")
+def dashboard():
+    if "email" not in session:
+        return redirect("/signin")
+    return f"Hello {session['email']} – inventory dashboard coming soon!"
+
+if __name__ == "__main__":
+    app.run(debug=True)

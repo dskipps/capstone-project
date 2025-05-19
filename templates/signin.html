@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign In</title>
+<style>
+  :root { --accent:#e63946; }
+
+  /* layout */
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial, sans-serif;
+    background:#fff;
+  }
+  .card{
+    width:320px;
+    padding:2rem 2.5rem;
+    border:1px solid #ddd;
+    border-radius:1rem;
+    box-shadow:0 6px 18px rgba(0,0,0,.06);
+    text-align:center;
+  }
+  h1{
+    margin:0 0 1.5rem 0;
+    color:var(--accent);
+    font-size:1.6rem;
+  }
+
+  form{ display:flex; flex-direction:column; gap:.9rem; }
+  label{ text-align:left; font-size:.9rem; font-weight:600; }
+  input{
+    padding:.6rem .7rem;
+    font-size:.95rem;
+    border:1px solid #ccc;
+    border-radius:.5rem;
+  }
+  button{
+    padding:.65rem;
+    font-size:1rem;
+    border:none;
+    border-radius:.5rem;
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+    transition:.2s;
+  }
+  button:hover{ opacity:.85; }
+
+  /* error line */
+  .error{ color:#e63946; margin:0 0 1rem 0; font-size:.9rem; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sign In</h1>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST" action="/signin">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+
+      <button type="submit">Log In</button>
+    </form>
+  </div>
+</body>
+</html>
