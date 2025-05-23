@@ -93,6 +93,19 @@
     .add-item button:hover {
       background: #21867a;
     }
+
+    .btn-edit {
+      padding: 0.4rem 0.8rem;
+      background: #f4a261;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .btn-edit:hover {
+      background: #e76f51;
+    }
   </style>
 </head>
 <body>
@@ -118,6 +131,7 @@
           <th>ID</th>
           <th>Name</th>
           <th>Quantity</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -126,10 +140,15 @@
           <td>{{ item.id }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.quantity }}</td>
+          <td>
+            <a href="{{ url_for('edit_item', item_id=item.id) }}">
+              <button class="btn-edit">Edit</button>
+            </a>
+          </td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="3">No items in inventory.</td>
+          <td colspan="4">No items in inventory.</td>
         </tr>
         {% endfor %}
       </tbody>
