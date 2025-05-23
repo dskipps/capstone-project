@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Inventory</title></head>
+<body>
+  <h1>Inventory</h1>
+  <a href="/add-item">Add New Item</a> | <a href="/logout">Logout</a>
+  <ul>
+    {% for item in items %}
+      <li>
+        {{ item.name }} – Qty: {{ item.quantity }}
+        [<a href="/edit-item/{{ item.id }}">Edit</a>]
+        [<a href="/delete-item/{{ item.id }}">Delete</a>]
+      </li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
