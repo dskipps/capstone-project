@@ -66,6 +66,7 @@ def inventory():
         db.session.commit()
         return redirect("/inventory?message=Item added")
 
+    message = request.args.get("message")
     items = Item.query.all()
     return render_template("inventory.html", items=items, message=message)
 
@@ -75,10 +76,11 @@ def edit_item(item_id):
         return redirect("/signin")
     item = Item.query.get_or_404(item_id)
     if request.method == "POST":
+        old_name = item.name
         item.name = request.form["name"]
         item.quantity = int(request.form["quantity"])
         db.session.commit()
-        return redirect("/inventory?message=Item updated")
+        return redirect("/inventory?message=Item updated {old_name} to {item.quantity}")
     return render_template("edit_item.html", item=item)
 
 @app.route("/delete-item/<int:item_id>", methods=["POST"])
@@ -86,9 +88,10 @@ def delete_item(item_id):
     if "email" not in session:
         return redirect("/signin")
     item = Item.query.get_or_404(item_id)
+    deleted_info = f"Deleted{item.quantity} {item.name}(s)"
     db.session.delete(item)
     db.session.commit()
-    return redirect("/inventory?message=Item deleted")
+    return redirect("/inventory?message={deleted_info}")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
