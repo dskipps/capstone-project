@@ -51,24 +51,21 @@ def dashboard():
         return redirect("/signin")
     return redirect("/inventory")
 
-@app.route("/inventory")
+@app.route("/inventory", methods=["GET", "POST"])
 def inventory():
     if "email" not in session:
         return redirect("/signin")
-    items = Item.query.all()
-    return render_template("inventory.html", items=items)
 
-@app.route("/add-item", methods=["GET", "POST"])
-def add_item():
-    if "email" not in session:
-        return redirect("/signin")
     if request.method == "POST":
         name = request.form["name"]
-        quantity = int(request.form["quantity"])
-        db.session.add(Item(name=name, quantity=quantity))
+        quantity = request.form["quantity"]
+        new_item = Item(name=name, quantity=int(quantity))
+        db.session.add(new_item)
         db.session.commit()
         return redirect("/inventory")
-    return render_template("add_item.html")
+
+    items = Item.query.all()
+    return render_template("inventory.html", items=items)
 
 @app.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
 def edit_item(item_id):
