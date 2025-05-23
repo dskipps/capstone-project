@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = "your-secret-key"  # Required for session management
 
 # ─── DATABASE CONFIGURATION ───────────────────────────────
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:MySecurePass123!@inventory-db.c16okmo081b8.us-west-1.rds.amazonaws.com:3306/inventory-db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:MySecurePass123!@inventory-db.c16okmo081b8.us-west-1.rds.amazonaws.com:3306/YOUR_DATABASE_NAME"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
