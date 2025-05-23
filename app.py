@@ -10,7 +10,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# ─── YOUR MODELS GO HERE (example below) ─────────────────
+# ─── YOUR MODELS GO HERE ──────────────────────────────────
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -56,16 +56,18 @@ def inventory():
     if "email" not in session:
         return redirect("/signin")
 
+    message = request.args.get("message")
+
     if request.method == "POST":
         name = request.form["name"]
         quantity = request.form["quantity"]
         new_item = Item(name=name, quantity=int(quantity))
         db.session.add(new_item)
         db.session.commit()
-        return redirect("/inventory")
+        return redirect("/inventory?message=Item added")
 
     items = Item.query.all()
-    return render_template("inventory.html", items=items)
+    return render_template("inventory.html", items=items, message=message)
 
 @app.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
 def edit_item(item_id):
@@ -76,7 +78,7 @@ def edit_item(item_id):
         item.name = request.form["name"]
         item.quantity = int(request.form["quantity"])
         db.session.commit()
-        return redirect("/inventory")
+        return redirect("/inventory?message=Item updated")
     return render_template("edit_item.html", item=item)
 
 @app.route("/delete-item/<int:item_id>", methods=["POST"])
@@ -86,8 +88,7 @@ def delete_item(item_id):
     item = Item.query.get_or_404(item_id)
     db.session.delete(item)
     db.session.commit()
-    return redirect("/inventory")
-
+    return redirect("/inventory?message=Item deleted")
 
 if __name__ == "__main__":
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')
