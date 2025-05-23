@@ -80,7 +80,7 @@ def edit_item(item_id):
         item.name = request.form["name"]
         item.quantity = int(request.form["quantity"])
         db.session.commit()
-        return redirect("/inventory?message=Item updated {old_name} to {item.quantity}")
+        return redirect(f"/inventory?message=Item updated {old_name} to {item.quantity}")
     return render_template("edit_item.html", item=item)
 
 @app.route("/delete-item/<int:item_id>", methods=["POST"])
@@ -91,7 +91,7 @@ def delete_item(item_id):
     deleted_info = f"Deleted{item.quantity} {item.name}(s)"
     db.session.delete(item)
     db.session.commit()
-    return redirect("/inventory?message={deleted_info}")
+    return redirect(f"/inventory?message={deleted_info}")
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
