@@ -1,17 +1,139 @@
 <!DOCTYPE html>
-<html>
-<head><title>Inventory</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #2a9d8f;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .btn-logout {
+      background: white;
+      color: #2a9d8f;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f7f7f7;
+    }
+
+    .add-item {
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .add-item input[type="text"],
+    .add-item input[type="number"] {
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .add-item button {
+      padding: 0.5rem 1rem;
+      background: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add-item button:hover {
+      background: #21867a;
+    }
+  </style>
+</head>
 <body>
-  <h1>Inventory</h1>
-  <a href="/add-item">Add New Item</a> | <a href="/logout">Logout</a>
-  <ul>
-    {% for item in items %}
-      <li>
-        {{ item.name }} – Qty: {{ item.quantity }}
-        [<a href="/edit-item/{{ item.id }}">Edit</a>]
-        [<a href="/delete-item/{{ item.id }}">Delete</a>]
-      </li>
-    {% endfor %}
-  </ul>
+  <header>
+    <h1>Inventory Dashboard</h1>
+    <form action="/logout" method="get">
+      <button class="btn-logout">Logout</button>
+    </form>
+  </header>
+
+  <main>
+    <form class="add-item" method="POST" action="/inventory">
+      <div>
+        <input type="text" name="name" placeholder="Item name" required>
+        <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+      </div>
+      <button type="submit">Add Item</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.quantity }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="3">No items in inventory.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
 </body>
 </html>
