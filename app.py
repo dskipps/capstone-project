@@ -79,7 +79,7 @@ def edit_item(item_id):
         return redirect("/inventory")
     return render_template("edit_item.html", item=item)
 
-@app.route("/delete-item/<int:item_id>")
+@app.route("/delete-item/<int:item_id>", methods=["POST"])
 def delete_item(item_id):
     if "email" not in session:
         return redirect("/signin")
