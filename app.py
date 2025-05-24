@@ -99,7 +99,7 @@ def inventory():
 
     # Filter items if search_query is present (search also by tags if you want)
     if search_query:
-        items = Item.query.filter(Item.name.ilike(f"%{search_query}%")).all()
+       items = Item.query.join(Item.tags, isouter=True).filter(db.or_(Item.name.ilike(f"%{search_query}%"),Tag.name.ilike(f"%{search_query}%"))).distinct().all()
     else:
         items = Item.query.all()
 
