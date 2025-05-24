@@ -31,23 +31,25 @@
             display: flex;
             justify-content: space-between;
         }
-        button {
+        button, .cancel-btn {
             padding: 0.7rem 1.2rem;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            display: inline-block;
+            line-height: normal;
         }
         .save-btn {
             background: #007bff;
-            color: white;
         }
         .save-btn:hover {
             background: #0056b3;
         }
         .cancel-btn {
             background: #6c757d;
-            color: white;
-            text-decoration: none;
         }
         .cancel-btn:hover {
             background: #5a6268;
@@ -63,9 +65,18 @@
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" required>
 
+        <label for="tags">Tags (comma separated):</label>
+        <input
+          type="text"
+          id="tags"
+          name="tags"
+          value="{% if item.tags %}{{ item.tags | map(attribute='name') | join(', ') }}{% endif %}"
+          placeholder="e.g. electronics, fragile, new"
+        >
+
         <div class="button-group">
             <button type="submit" class="save-btn">Save Changes</button>
-            <a href="/inventory" class="cancel-btn"><button type="button" class="cancel-btn">Cancel</button></a>
+            <a href="/inventory" class="cancel-btn">Cancel</a>
         </div>
     </form>
 </body>
