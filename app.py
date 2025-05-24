@@ -79,14 +79,29 @@ def inventory():
 def edit_item(item_id):
     if "email" not in session:
         return redirect("/signin")
+
     item = Item.query.get_or_404(item_id)
+
     if request.method == "POST":
-        old_name = item.name
-        item.name = request.form["name"]
-        item.quantity = int(request.form["quantity"])
+        new_name = request.form["name"].strip().lower()
+        new_quantity = int(request.form["quantity"])
+
+        # Check for duplicate name in other items
+        duplicate = Item.query.filter(
+            db.func.lower(Item.name) == new_name,
+            Item.id != item.id
+        ).first()
+
+        if duplicate:
+            return redirect(f"/inventory?message=Another item with name '{new_name.capitalize()}' already exists.")
+
+        item.name = new_name.capitalize()
+        item.quantity = new_quantity
         db.session.commit()
-        return redirect(f"/inventory?message=Item updated {old_name} to {item.quantity}")
+        return redirect(f"/inventory?message=Item '{item.name}' updated.")
+
     return render_template("edit_item.html", item=item)
+
 
 @app.route("/delete-item/<int:item_id>", methods=["POST"])
 def delete_item(item_id):
