@@ -10,11 +10,21 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+item_tags = db.Table('item_tags',
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id'), primary_key=True),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
+)
+
 # ─── YOUR MODELS GO HERE ──────────────────────────────────
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     quantity = db.Column(db.Integer)
+    tags = db.relationship('Tag', secondary=item_tags, backref=db.backref('items', lazy='dynamic'))
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
 
 # ─── CREATE TABLES ONCE ───────────────────────────────────
 with app.app_context():
@@ -62,6 +72,7 @@ def inventory():
     if request.method == "POST":
         name = request.form["name"].strip()
         quantity = request.form["quantity"]
+        tags_str = request.form.get("tags", "").strip()  # Get tags from form
 
         # Duplicate check
         existing_item = Item.query.filter(db.func.lower(Item.name) == name.lower()).first()
@@ -69,18 +80,30 @@ def inventory():
             return redirect("/inventory?message=Item already exists.")
 
         new_item = Item(name=name.capitalize(), quantity=int(quantity))
+
+        # Process tags (comma separated)
+        if tags_str:
+            tag_names = [t.strip().lower() for t in tags_str.split(",") if t.strip()]
+            tags = []
+            for tag_name in tag_names:
+                tag = Tag.query.filter_by(name=tag_name).first()
+                if not tag:
+                    tag = Tag(name=tag_name)
+                    db.session.add(tag)
+                tags.append(tag)
+            new_item.tags = tags
+
         db.session.add(new_item)
         db.session.commit()
         return redirect("/inventory?message=Item added")
 
-    # Filter items if search_query is present
+    # Filter items if search_query is present (search also by tags if you want)
     if search_query:
         items = Item.query.filter(Item.name.ilike(f"%{search_query}%")).all()
     else:
         items = Item.query.all()
 
     return render_template("inventory.html", items=items, message=message)
-
 
 @app.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
 def edit_item(item_id):
@@ -108,7 +131,6 @@ def edit_item(item_id):
         return redirect(f"/inventory?message=Item '{item.name}' updated.")
 
     return render_template("edit_item.html", item=item)
-
 
 @app.route("/delete-item/<int:item_id>", methods=["POST"])
 def delete_item(item_id):

@@ -129,6 +129,12 @@
     .action-buttons form {
       margin: 0;
     }
+
+    .tags {
+      font-size: 0.9rem;
+      color: #555;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
@@ -160,6 +166,8 @@
       <div>
         <input type="text" name="name" placeholder="Item name" required>
         <input type="number" name="quantity" placeholder="Quantity" min="1" required>
+        <!-- New input for tags -->
+        <input type="text" name="tags" placeholder="Tags (comma separated)">
       </div>
       <button type="submit">Add Item</button>
     </form>
@@ -170,6 +178,7 @@
           <th>ID</th>
           <th>Name</th>
           <th>Quantity</th>
+          <th>Tags</th>  <!-- New tags column -->
           <th>Actions</th>
         </tr>
       </thead>
@@ -179,6 +188,13 @@
           <td>{{ loop.index }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.quantity }}</td>
+          <td class="tags">
+            {% if item.tags %}
+              {{ item.tags | map(attribute='name') | join(', ') }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
           <td class="action-buttons">
             <a href="{{ url_for('edit_item', item_id=item.id) }}">
               <button class="btn-edit">Edit</button>
@@ -190,7 +206,7 @@
         </tr>
         {% else %}
         <tr>
-          <td colspan="4">No items in inventory.</td>
+          <td colspan="5">No items in inventory.</td>
         </tr>
         {% endfor %}
       </tbody>
