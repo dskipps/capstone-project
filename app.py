@@ -59,14 +59,19 @@ def inventory():
     message = request.args.get("message")
 
     if request.method == "POST":
-        name = request.form["name"]
-        quantity = request.form["quantity"]
-        new_item = Item(name=name, quantity=int(quantity))
+        name = request.form["name"].strip().lower()
+        quantity = int(request.form["quantity"])
+
+        existing_item = Item.query.filter(db.func.lower(Item.name) == name).first()
+        if existing_item:
+            return redirect("/inventory?message=Item '%s' already exists." % name.capitalize())
+
+        
+        new_item = Item(name=name.capitalize(), quantity=quantity)
         db.session.add(new_item)
         db.session.commit()
-        return redirect("/inventory?message=Item added")
+        return redirect("/inventory?message=Item '%s' added." % name.capitalize())
 
-    message = request.args.get("message")
     items = Item.query.all()
     return render_template("inventory.html", items=items, message=message)
 
