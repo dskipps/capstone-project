@@ -57,23 +57,30 @@ def inventory():
         return redirect("/signin")
 
     message = request.args.get("message")
+    search_query = request.args.get("search", "").strip().lower()
 
     if request.method == "POST":
-        name = request.form["name"].strip().lower()
-        quantity = int(request.form["quantity"])
+        name = request.form["name"].strip()
+        quantity = request.form["quantity"]
 
-        existing_item = Item.query.filter(db.func.lower(Item.name) == name).first()
+        # Duplicate check
+        existing_item = Item.query.filter(db.func.lower(Item.name) == name.lower()).first()
         if existing_item:
-            return redirect("/inventory?message=Item '%s' already exists." % name.capitalize())
+            return redirect("/inventory?message=Item already exists.")
 
-        
-        new_item = Item(name=name.capitalize(), quantity=quantity)
+        new_item = Item(name=name.capitalize(), quantity=int(quantity))
         db.session.add(new_item)
         db.session.commit()
-        return redirect("/inventory?message=Item '%s' added." % name.capitalize())
+        return redirect("/inventory?message=Item added")
 
-    items = Item.query.all()
+    # Filter items if search_query is present
+    if search_query:
+        items = Item.query.filter(Item.name.ilike(f"%{search_query}%")).all()
+    else:
+        items = Item.query.all()
+
     return render_template("inventory.html", items=items, message=message)
+
 
 @app.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
 def edit_item(item_id):

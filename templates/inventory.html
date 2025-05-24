@@ -145,6 +145,17 @@
             {{ message }}
         </div>
      {% endif %}
+     <form method="GET" action="/inventory" style="margin-bottom: 1.5rem;">
+      <input
+        type="text"
+        name="search"
+        placeholder="Search items..."
+        value="{{ request.args.get('search', '') }}"
+        style="padding: 0.5rem; width: 200px; border: 1px solid #ccc; border-radius: 5px;"
+      >
+      <button type="submit" style="padding: 0.5rem 1rem; border: none; background: #2a9d8f; color: white; border-radius: 5px; cursor: pointer;">Search</button>
+    </form>
+    
     <form class="add-item" method="POST" action="/inventory">
       <div>
         <input type="text" name="name" placeholder="Item name" required>
