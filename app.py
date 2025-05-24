@@ -121,12 +121,28 @@ def edit_item(item_id):
             db.func.lower(Item.name) == new_name,
             Item.id != item.id
         ).first()
-
         if duplicate:
             return redirect(f"/inventory?message=Another item with name '{new_name.capitalize()}' already exists.")
 
+        # Update fields
         item.name = new_name.capitalize()
         item.quantity = new_quantity
+
+        # --- NEW: Handle tags ---
+        tags_str = request.form.get("tags", "").strip()
+        if tags_str:
+            tag_names = [t.strip().lower() for t in tags_str.split(",") if t.strip()]
+            new_tags = []
+            for tag_name in tag_names:
+                tag = Tag.query.filter_by(name=tag_name).first()
+                if not tag:
+                    tag = Tag(name=tag_name)
+                    db.session.add(tag)
+                new_tags.append(tag)
+            item.tags = new_tags
+        else:
+            item.tags = []  # Clear tags if empty
+
         db.session.commit()
         return redirect(f"/inventory?message=Item '{item.name}' updated.")
 
