@@ -165,7 +165,7 @@
       <tbody>
         {% for item in items %}
         <tr>
-          <td>{{ item.id }}</td>
+          <td>{{ loop.index }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.quantity }}</td>
           <td class="action-buttons">

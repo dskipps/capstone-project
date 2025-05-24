@@ -88,7 +88,7 @@ def delete_item(item_id):
     if "email" not in session:
         return redirect("/signin")
     item = Item.query.get_or_404(item_id)
-    deleted_info = f"Deleted{item.quantity} {item.name}(s)"
+    deleted_info = f"Deleted {item.quantity} {item.name}(s)"
     db.session.delete(item)
     db.session.commit()
     return redirect(f"/inventory?message={deleted_info}")
