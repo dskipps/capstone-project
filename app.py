@@ -6,6 +6,16 @@ import io
 from io import StringIO
 import datetime
 import os
+import json
+
+def get_db_secret():
+    secret_name = "myapp/rds/mysql"  # Use your actual secret name
+    region_name = "us-west-1"        # Replace with your region
+
+    client = boto3.client("secretsmanager", region_name=region_name)
+    response = client.get_secret_value(SecretId=secret_name)
+    secret = json.loads(response["SecretString"])
+    return secret
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key" 
@@ -17,7 +27,14 @@ S3_REGION = "us-west-1"
 s3 = boto3.client('s3', region_name=S3_REGION)
 
 # ─── DATABASE CONFIGURATION ───────────────────────────
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:MySecurePass123!@inventory-db.c16okmo081b8.us-west-1.rds.amazonaws.com:3306/inventory"
+#app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:MySecurePass123!@inventory-db.c16okmo081b8.us-west-1.rds.amazonaws.com:3306/inventory"
+
+db_secret = get_db_secret()
+db_user = db_secret["username"]
+db_pass = db_secret["password"]
+db_host = db_secret["host"]
+db_name = db_secret["dbname"]
+app.config['SQLALCHEMY_DATABASE_URI'] = (f"mysql+pymysql://{db_user}:{db_pass}@{db_host}:3306/{db_name}")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
