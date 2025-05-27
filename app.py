@@ -13,6 +13,8 @@ app.secret_key = "your-secret-key"
 S3_BUCKET_NAME = "my-capstone-bucket"
 S3_REGION = "us-west-1"              
 
+s3 = boto3.client('s3', region_name=S3_REGION)
+
 # ─── DATABASE CONFIGURATION ───────────────────────────
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:MySecurePass123!@inventory-db.c16okmo081b8.us-west-1.rds.amazonaws.com:3306/inventory"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
