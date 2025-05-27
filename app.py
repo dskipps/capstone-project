@@ -133,7 +133,7 @@ def export_csv():
         writer.writerow([item.id, item.name, item.quantity, tag_names])
 
     # Generate unique filename
-    filename = f"inventory_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    filename = f"inventory_export_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     s3.upload_fileobj(
         io.BytesIO(csv_buffer.getvalue().encode("utf-8")),
         S3_BUCKET_NAME,
