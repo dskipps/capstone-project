@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.secret_key = "your-secret-key"  # Required for session management
+app.secret_key = "your-secret-key" 
 
-# ─── DATABASE CONFIGURATION ───────────────────────────────
+# ─── DATABASE CONFIGURATION ───────────────────────────
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:MySecurePass123!@inventory-db.c16okmo081b8.us-west-1.rds.amazonaws.com:3306/inventory"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -15,7 +15,7 @@ item_tags = db.Table('item_tags',
     db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), primary_key=True)
 )
 
-# ─── YOUR MODELS GO HERE ──────────────────────────────────
+# ─── MODELS ─────────────────────────
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -26,16 +26,16 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
 
-# ─── CREATE TABLES ONCE ───────────────────────────────────
+# ─── CREATE TABLES ONCE ──────────────────────────
 with app.app_context():
     db.create_all()
 
-# ─── TEMPORARY USER STORE ─────────────────────────────────
+# ─── TEMPORARY USER STORE ───────────────────────
 USERS = {
     "admin@example.com": {"name": "Admin", "password": "letmein"},
 }
 
-# ─── ROUTES ───────────────────────────────────────────────
+# ─── ROUTES ───────────────────────────────────
 @app.route("/signin", methods=["GET", "POST"])
 def signin():
     error = None
@@ -68,6 +68,8 @@ def inventory():
 
     message = request.args.get("message")
     search_query = request.args.get("search", "").strip().lower()
+    page = request.args.get("page", 1, type=int)
+    per_page = 10
 
     if request.method == "POST":
         name = request.form["name"].strip()
@@ -81,7 +83,7 @@ def inventory():
 
         new_item = Item(name=name.capitalize(), quantity=int(quantity))
 
-        # Process tags (comma separated)
+        # Process tags
         if tags_str:
             tag_names = [t.strip().lower() for t in tags_str.split(",") if t.strip()]
             tags = []
@@ -97,13 +99,13 @@ def inventory():
         db.session.commit()
         return redirect("/inventory?message=Item added")
 
-    # Filter items if search_query is present (search also by tags if you want)
+    query = Item.query.join(Item.tags, isouter=True)
     if search_query:
-       items = Item.query.join(Item.tags, isouter=True).filter(db.or_(Item.name.ilike(f"%{search_query}%"),Tag.name.ilike(f"%{search_query}%"))).distinct().all()
-    else:
-        items = Item.query.all()
+        query = query.filter(db.or_(Item.name.ilike(f"%{search_query}%"), Tag.name.ilike(f"%{search_query}%"))).distinct()
 
-    return render_template("inventory.html", items=items, message=message)
+    pagination = query.order_by(Item.id.desc()).paginate(page=page, per_page=per_page)
+
+    return render_template("inventory.html", items=pagination.items, message=message, pagination=pagination, request=request)
 
 @app.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
 def edit_item(item_id):
