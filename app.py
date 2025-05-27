@@ -1,8 +1,17 @@
 from flask import Flask, render_template, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
+import csv
+import boto3
+from io import StringIO
+import datetime
+import os
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key" 
+
+# ─── S3 CONFIGURATION ───────────────────────────
+S3_BUCKET_NAME = "my-capstone-bucket"
+S3_REGION = "us-west-1"              
 
 # ─── DATABASE CONFIGURATION ───────────────────────────
 app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+pymysql://admin:MySecurePass123!@inventory-db.c16okmo081b8.us-west-1.rds.amazonaws.com:3306/inventory"
@@ -106,6 +115,34 @@ def inventory():
     pagination = query.order_by(Item.id.desc()).paginate(page=page, per_page=per_page)
 
     return render_template("inventory.html", items=pagination.items, message=message, pagination=pagination, request=request)
+
+@app.route("/export-csv")
+def export_csv():
+    if "email" not in session:
+        return redirect("/signin")
+
+    items = Item.query.order_by(Item.id).all()
+
+    # Build CSV in-memory
+    csv_buffer = io.StringIO()
+    writer = csv.writer(csv_buffer)
+    writer.writerow(["ID", "Name", "Quantity", "Tags"])
+
+    for item in items:
+        tag_names = ", ".join(tag.name for tag in item.tags)
+        writer.writerow([item.id, item.name, item.quantity, tag_names])
+
+    # Generate unique filename
+    filename = f"inventory_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    s3.upload_fileobj(
+        io.BytesIO(csv_buffer.getvalue().encode("utf-8")),
+        S3_BUCKET_NAME,
+        filename,
+        ExtraArgs={"ContentType": "text/csv"}
+    )
+
+    return redirect(f"/inventory?message=CSV exported to S3 as {filename}")
+
 
 @app.route("/edit-item/<int:item_id>", methods=["GET", "POST"])
 def edit_item(item_id):
