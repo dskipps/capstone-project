@@ -124,7 +124,7 @@ def export_csv():
     items = Item.query.order_by(Item.id).all()
 
     # Build CSV in-memory
-    csv_buffer = io.StringIO()
+    csv_buffer = StringIO()
     writer = csv.writer(csv_buffer)
     writer.writerow(["ID", "Name", "Quantity", "Tags"])
 
