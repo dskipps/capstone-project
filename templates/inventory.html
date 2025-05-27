@@ -137,19 +137,27 @@
     }
 
     .pagination {
+      margin-top: 1.5rem;
       text-align: center;
-      margin-top: 20px;
     }
 
     .pagination a,
     .pagination strong {
-      margin: 0 5px;
+      margin: 0 0.25rem;
+      padding: 0.4rem 0.7rem;
+      background: #eee;
+      border-radius: 5px;
       text-decoration: none;
-      color: #2a9d8f;
+      color: #333;
     }
 
     .pagination strong {
-      font-weight: bold;
+      background: #2a9d8f;
+      color: white;
+    }
+
+    .pagination a:hover {
+      background: #ccc;
     }
   </style>
 </head>
@@ -167,7 +175,7 @@
             {{ message }}
         </div>
     {% endif %}
-    
+
     <form method="GET" action="/inventory" style="margin-bottom: 1.5rem;">
       <input
         type="text"
@@ -202,9 +210,9 @@
         </tr>
       </thead>
       <tbody>
-        {% for item in items %}
+        {% for item in pagination.items %}
         <tr>
-          <td>{{ loop.index + (pagination.current_page - 1) * 10 }}</td>
+          <td>{{ loop.index + (pagination.page - 1) * 10 }}</td>
           <td>{{ item.name }}</td>
           <td>{{ item.quantity }}</td>
           <td class="tags">
@@ -231,14 +239,14 @@
       </tbody>
     </table>
 
-    {% if pagination.total_pages > 1 %}
+    {% if pagination.pages > 1 %}
     <div class="pagination">
       {% if pagination.has_prev %}
-        <a href="{{ url_for('inventory', page=pagination.current_page - 1, search=request.args.get('search', '')) }}">&laquo; Prev</a>
+        <a href="{{ url_for('inventory', page=pagination.page - 1, search=request.args.get('search', '')) }}">&laquo; Prev</a>
       {% endif %}
 
-      {% for page_num in range(1, pagination.total_pages + 1) %}
-        {% if page_num == pagination.current_page %}
+      {% for page_num in range(1, pagination.pages + 1) %}
+        {% if page_num == pagination.page %}
           <strong>{{ page_num }}</strong>
         {% else %}
           <a href="{{ url_for('inventory', page=page_num, search=request.args.get('search', '')) }}">{{ page_num }}</a>
@@ -246,7 +254,7 @@
       {% endfor %}
 
       {% if pagination.has_next %}
-        <a href="{{ url_for('inventory', page=pagination.current_page + 1, search=request.args.get('search', '')) }}">Next &raquo;</a>
+        <a href="{{ url_for('inventory', page=pagination.page + 1, search=request.args.get('search', '')) }}">Next &raquo;</a>
       {% endif %}
     </div>
     {% endif %}
