@@ -9,7 +9,7 @@ import os
 import json
 
 def get_db_secret():
-    secret_name = "prod/capstone/mysql-cZILKj"
+    secret_name = "prod/capstone/mysql"
     region_name = "us-west-1"        
 
     client = boto3.client("secretsmanager", region_name=region_name)
