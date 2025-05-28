@@ -1,7 +1,7 @@
 import boto3
 import json
 
-secret_name = "prod/capstone/mysql-cZILKj"
+secret_name = "prod/capstone/mysql"
 region_name = "us-west-1"
 
 client = boto3.client("secretsmanager", region_name=region_name)
