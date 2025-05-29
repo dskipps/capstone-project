@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Item</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f7f7f7;
+        }
+        form {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .button-group {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        button, .cancel-btn {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            display: inline-block;
+            line-height: normal;
+        }
+        .save-btn {
+            background: #007bff;
+        }
+        .save-btn:hover {
+            background: #0056b3;
+        }
+        .cancel-btn {
+            background: #6c757d;
+        }
+        .cancel-btn:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">Edit Item</h2>
+    <form method="POST">
+        <label for="name">Item Name:</label>
+        <input type="text" id="name" name="name" value="{{ item.name }}" required>
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" value="{{ item.quantity }}" required>
+
+        <label for="tags">Tags (comma separated):</label>
+        <input
+          type="text"
+          id="tags"
+          name="tags"
+          value="{% if item.tags %}{{ item.tags | map(attribute='name') | join(', ') }}{% endif %}"
+          placeholder="e.g. electronics, fruits, fragile"
+        >
+
+        <div class="button-group">
+            <button type="submit" class="save-btn">Save Changes</button>
+            <a href="/inventory" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</body>
+</html>
